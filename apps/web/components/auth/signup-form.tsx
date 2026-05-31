@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
@@ -9,11 +10,15 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { FormRootError } from "@/components/auth/_form-root-error";
 
 import { authClient } from "@/lib/auth/client";
 import { SignupFormData, signupSchema } from "@/lib/auth/schema";
 
 export default function SignupForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -24,24 +29,37 @@ export default function SignupForm() {
     },
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const rootError = form.formState.errors.root;
+  const isSubmitting = form.formState.isSubmitting;
 
   const handleSignup = async (data: SignupFormData) => {
     try {
-      await authClient.signUp.email({
+      const { error: signupError } = await authClient.signUp.email({
         name: data.name,
         email: data.email,
         password: data.password,
       });
+
+      if (signupError) {
+        form.setError("root", signupError);
+        return;
+      }
+
+      const { error: signinError } = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (signinError) {
+        router.push("/login");
+        return;
+      }
+
+      router.push("/");
     } catch (error) {
       console.error("Signup error:", error);
     }
   };
-
-  const isSubmitting = form.formState.isSubmitting;
-
-  console.log(form.getFieldState("email"));
 
   return (
     <Card className="w-full max-w-md p-8">
@@ -50,6 +68,8 @@ export default function SignupForm() {
         className="space-y-4"
         noValidate
       >
+        {rootError && <FormRootError>{rootError.message}</FormRootError>}
+
         <Controller
           name="name"
           control={form.control}

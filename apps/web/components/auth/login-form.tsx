@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
@@ -9,11 +10,14 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { FormRootError } from "@/components/auth/_form-root-error";
 
 import { authClient } from "@/lib/auth/client";
 import { LoginFormData, loginSchema } from "@/lib/auth/schema";
 
 export default function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -22,20 +26,26 @@ export default function LoginForm() {
     },
   });
 
-  const [showPassword, setShowPassword] = useState(false);
+  const rootError = form.formState.errors.root;
+  const isSubmitting = form.formState.isSubmitting;
 
   const handleLogin = async (data: LoginFormData) => {
     try {
-      await authClient.signIn.email({
+      const { error: signinError } = await authClient.signIn.email({
         email: data.email,
         password: data.password,
       });
+
+      if (signinError) {
+        form.setError("root", signinError);
+        return;
+      }
+
+      router.push("/");
     } catch (error) {
       console.error("Login error:", error);
     }
   };
-
-  const isSubmitting = form.formState.isSubmitting;
 
   return (
     <Card className="w-full max-w-md p-8">
@@ -52,6 +62,8 @@ export default function LoginForm() {
           className="space-y-4"
           noValidate
         >
+          {rootError && <FormRootError>{rootError.message}</FormRootError>}
+
           <Controller
             name="email"
             control={form.control}
