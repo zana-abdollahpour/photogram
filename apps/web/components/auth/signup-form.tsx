@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 
+import { authClient } from "@/lib/auth/client";
 import { SignupFormData, signupSchema } from "@/lib/auth/schema";
 
 export default function SignupForm() {
@@ -26,10 +27,13 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSubmit = async (data: SignupFormData) => {
+  const handleSignup = async (data: SignupFormData) => {
     try {
-      // TODO: submit data
-      console.log(data);
+      await authClient.signUp.email({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
     } catch (error) {
       console.error("Signup error:", error);
     }
@@ -42,7 +46,7 @@ export default function SignupForm() {
   return (
     <Card className="w-full max-w-md p-8">
       <form
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={form.handleSubmit(handleSignup)}
         className="space-y-4"
         noValidate
       >
