@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
 import { DATABASE_CONNECTION } from 'src/database/database.connection';
+import * as authSchema from 'src/auth/schema';
 
 @Module({
   imports: [ConfigModule],
@@ -16,9 +17,12 @@ import { DATABASE_CONNECTION } from 'src/database/database.connection';
           connectionString: configService.getOrThrow('DATABASE_URL'),
         });
 
-        return drizzle(pool);
+        return drizzle(pool, {
+          schema: authSchema,
+        });
       },
     },
   ],
+  exports: [DATABASE_CONNECTION],
 })
 export class DatabaseModule {}
