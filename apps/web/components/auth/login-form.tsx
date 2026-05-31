@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 
+import { authClient } from "@/lib/auth/client";
 import { LoginFormData, loginSchema } from "@/lib/auth/schema";
 
 export default function LoginForm() {
@@ -23,10 +24,12 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (data: LoginFormData) => {
+  const handleLogin = async (data: LoginFormData) => {
     try {
-      // TODO: handle submit
-      console.log(data);
+      await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+      });
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -45,7 +48,7 @@ export default function LoginForm() {
         </div>
 
         <form
-          onSubmit={form.handleSubmit(handleSubmit)}
+          onSubmit={form.handleSubmit(handleLogin)}
           className="space-y-4"
           noValidate
         >
