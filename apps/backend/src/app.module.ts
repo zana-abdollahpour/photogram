@@ -8,6 +8,7 @@ import { betterAuth } from 'better-auth';
 
 import { DatabaseModule } from './database/database.module';
 import { DATABASE_CONNECTION } from 'src/database/database.connection';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DATABASE_CONNECTION } from 'src/database/database.connection';
         }),
       }),
     }),
+    PostsModule,
   ],
   controllers: [],
   providers: [
