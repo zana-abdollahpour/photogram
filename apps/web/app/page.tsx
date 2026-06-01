@@ -1,3 +1,4 @@
+import { Feed } from "@/components/dashboard/feed";
 import { Stories } from "@/components/dashboard/stories";
 
 export default function HomePage() {
@@ -7,7 +8,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
             <Stories />
-            {/* TODO: feed */}
+            <Feed />
           </div>
 
           <div className="lg:sticky lg:top-8 lg:h-fit">
