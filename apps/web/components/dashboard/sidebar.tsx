@@ -1,12 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth/client";
 
 export function Sidebar() {
+  const router = useRouter();
   const { data: session } = authClient.useSession();
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+    router.push("/login");
+  };
 
   return (
     <div className="space-y-6">
@@ -25,6 +35,19 @@ export function Sidebar() {
             <div className="text-muted-foreground truncate text-sm">
               {session?.user.name}
             </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              title="Sign Out"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={handleLogout}
+            >
+              <LogOut className="size-4" />
+            </Button>
           </div>
         </div>
       </Card>
