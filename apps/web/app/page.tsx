@@ -1,5 +1,6 @@
-import { Feed } from "@/components/dashboard/feed";
 import { Stories } from "@/components/dashboard/stories";
+import { Feed } from "@/components/dashboard/feed";
+import { Sidebar } from "@/components/dashboard/sidebar";
 
 export default function HomePage() {
   return (
@@ -12,7 +13,7 @@ export default function HomePage() {
           </div>
 
           <div className="lg:sticky lg:top-8 lg:h-fit">
-            {/* TODO: sidebar */}
+            <Sidebar />
           </div>
         </div>
       </div>
