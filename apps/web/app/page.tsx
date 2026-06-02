@@ -1,6 +1,7 @@
 import { Stories } from "@/components/dashboard/stories";
 import { Feed } from "@/components/dashboard/feed";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import { PhotoUpload } from "@/components/dashboard/photo-upload";
 
 export default function HomePage() {
   return (
@@ -17,6 +18,8 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      <PhotoUpload />
     </div>
   );
 }
