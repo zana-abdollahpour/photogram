@@ -5,6 +5,12 @@ import { Pool } from 'pg';
 
 import { DATABASE_CONNECTION } from 'src/database/database.connection';
 import * as authSchema from 'src/auth/schema';
+import * as postSchema from 'src/posts/schemas/schema';
+
+export const schema = {
+  ...authSchema,
+  ...postSchema,
+};
 
 @Module({
   imports: [ConfigModule],
@@ -17,9 +23,7 @@ import * as authSchema from 'src/auth/schema';
           connectionString: configService.getOrThrow('DATABASE_URL'),
         });
 
-        return drizzle(pool, {
-          schema: authSchema,
-        });
+        return drizzle(pool, { schema });
       },
     },
   ],
