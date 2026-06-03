@@ -5,6 +5,7 @@ import { useCallback, useRef, useState } from "react";
 import { Image as ImageIcon, Plus, Upload, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc/client";
 import { useDebouncedFunction } from "@/hooks/useDebouncedFunction";
 
 import { Fab } from "@/components/ui/fab";
@@ -28,6 +29,7 @@ export function PhotoUpload() {
   const [caption, setCaption] = useState("");
   const dialogCloseRef = useRef<HTMLButtonElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const createPost = trpc.postsRouter.create.useMutation();
 
   const handleSelectFile = (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) {
@@ -94,9 +96,12 @@ export function PhotoUpload() {
         body: formData,
       });
 
-      if (!uploadResponse) {
+      if (!uploadResponse.ok) {
         throw new Error("failed to upload image");
       }
+
+      const { filename } = await uploadResponse.json();
+      await createPost.mutateAsync({ image: filename, caption: caption });
 
       handleClearSelection();
       if (dialogCloseRef.current) {

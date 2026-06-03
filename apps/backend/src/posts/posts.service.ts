@@ -22,7 +22,7 @@ export class PostsService {
       .values({
         userId: userId,
         caption: createPostInput.caption,
-        image: '', // TODO: add real image url
+        image: createPostInput.image,
         likes: 0,
         createdAt: new Date(),
       })
