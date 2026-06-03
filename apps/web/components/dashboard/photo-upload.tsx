@@ -85,7 +85,18 @@ export function PhotoUpload() {
     try {
       setIsUploading(true);
 
-      // TODO: handle upload
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      formData.append("caption", caption);
+
+      const uploadResponse = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadResponse) {
+        throw new Error("failed to upload image");
+      }
 
       handleClearSelection();
       if (dialogCloseRef.current) {
