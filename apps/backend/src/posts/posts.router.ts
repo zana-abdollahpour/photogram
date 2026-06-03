@@ -15,7 +15,10 @@ export class PostsRouter {
   @Mutation({ input: createPostSchema, output: postSchema })
   async create(@Input() createPostInput: CreatePostInput) {
     // TODO: use real userId
-    return this.postsService.create(createPostInput, '123');
+    return this.postsService.create(
+      createPostInput,
+      'P2Xcog2FIElsecdpWWfQ6CXaY95qNH99',
+    );
   }
 
   @Query({ output: z.array(postSchema) })

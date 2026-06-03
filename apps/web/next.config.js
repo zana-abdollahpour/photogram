@@ -8,6 +8,14 @@ const nextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: process.env.BACKEND_HOST,
+        protocol: process.env.BACKEND_PROTOCOL,
+      },
+    ],
+  },
 };
 
 export default nextConfig;

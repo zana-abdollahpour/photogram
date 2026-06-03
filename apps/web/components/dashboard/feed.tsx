@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, User } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc/client";
 
 interface Post {
   id: string;
@@ -19,67 +20,39 @@ interface Post {
   timestamp: string;
 }
 
-// TODO: replace with real data from backend
-const mockPosts: Post[] = [
-  {
-    id: "1",
-    user: {
-      username: "johndoe",
-      avatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-    },
-    image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop",
-    caption: "Beautiful sunset at the beach 🌅",
-    likes: 142,
-    comments: 8,
-    timestamp: "2 hours ago",
-  },
-  {
-    id: "2",
-    user: {
-      username: "janedoe",
-      avatar:
-        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=60&h=60&fit=crop&crop=faces",
-    },
-    image:
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=600&fit=crop",
-    caption: "Coffee and code ☕️ #dev #coffee",
-    likes: 89,
-    comments: 12,
-    timestamp: "4 hours ago",
-  },
-  {
-    id: "3",
-    user: {
-      username: "photographer",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-    },
-    image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop",
-    caption: "Mountain adventures never get old 🏔️",
-    likes: 256,
-    comments: 23,
-    timestamp: "6 hours ago",
-  },
-];
-
 export function Feed() {
+  const posts = trpc.postsRouter.findAll.useQuery();
+  const getImageUrl = (imagePath: string) => {
+    return `${process.env.NEXT_PUBLIC_API_URL}/uploads/images/${imagePath}`;
+  };
+  const getAvatarUrl = (avatarPath: string) => {
+    if (!avatarPath) {
+      return "";
+    }
+    return `${process.env.NEXT_PUBLIC_API_URL}/uploads/images/${avatarPath}`;
+  };
+
   return (
     <div className="space-y-6">
-      {mockPosts.map((post) => (
+      {posts.data?.map((post) => (
         <Card key={post.id} className="overflow-hidden">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-3">
-              <Image
-                src={post.user.avatar}
-                alt={post.user.username}
-                width={64}
-                height={64}
-                className="h-8 w-8 rounded-full"
-                unoptimized // TODO: remove later for real data
-              />
+              {getAvatarUrl(post.user.avatar) ? (
+                <Image
+                  src={getAvatarUrl(post.user.avatar)}
+                  alt={post.user.username}
+                  width={64}
+                  height={64}
+                  className="h-8 w-8 rounded-full"
+                  unoptimized // TODO: remove later for real data
+                />
+              ) : (
+                <div className="bg-muted flex size-8 items-center justify-center rounded-full">
+                  <User className="text-muted-foreground size-4" />
+                </div>
+              )}
+
               <span className="text-sm font-semibold">
                 {post.user.username}
               </span>
@@ -88,11 +61,10 @@ export function Feed() {
 
           <div className="relative aspect-square">
             <Image
-              src={post.image}
+              fill
+              src={getImageUrl(post.image)}
               alt="Post"
-              className="h-full w-full object-cover"
-              width={600}
-              height={600}
+              className="object-cover"
               unoptimized // TODO: remove later for real data
             />
           </div>

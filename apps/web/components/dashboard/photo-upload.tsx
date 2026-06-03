@@ -29,7 +29,12 @@ export function PhotoUpload() {
   const [caption, setCaption] = useState("");
   const dialogCloseRef = useRef<HTMLButtonElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const createPost = trpc.postsRouter.create.useMutation();
+  const utils = trpc.useUtils();
+  const createPost = trpc.postsRouter.create.useMutation({
+    onSuccess: () => {
+      utils.postsRouter.findAll.invalidate();
+    },
+  });
 
   const handleSelectFile = (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) {
