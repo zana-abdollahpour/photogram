@@ -36,3 +36,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Generated tRPC router types
+packages/trpc/src/server/server.ts

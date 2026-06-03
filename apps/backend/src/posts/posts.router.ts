@@ -1,4 +1,4 @@
-import { Input, Mutation, Query, Router } from 'nestjs-trpc';
+import { Input, Mutation, Query, Router } from 'nestjs-trpc-v2';
 import z from 'zod';
 
 import { PostsService } from 'src/posts/posts.service';
