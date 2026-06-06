@@ -13,6 +13,8 @@ import { AuthTrpcMiddleware } from 'src/auth/auth-trpc.middleware';
 import {
   postSchema,
   createPostSchema,
+  likePostSchema,
+  type LikePostInput,
   type CreatePostInput,
 } from 'src/posts/schemas/trpc.schema';
 
@@ -23,7 +25,7 @@ import type { AppContext } from 'src/app-context.interface';
 export class PostsRouter {
   constructor(private readonly postsService: PostsService) {}
 
-  @Mutation({ input: createPostSchema, output: postSchema })
+  @Mutation({ input: createPostSchema })
   async create(
     @Input() createPostInput: CreatePostInput,
     @Ctx() context: AppContext,
@@ -32,7 +34,15 @@ export class PostsRouter {
   }
 
   @Query({ output: z.array(postSchema) })
-  async findAll() {
-    return this.postsService.findAll();
+  async findAll(@Ctx() context: AppContext) {
+    return this.postsService.findAll(context.user!.id);
+  }
+
+  @Mutation({ input: likePostSchema })
+  async likePost(
+    @Input() likePostInput: LikePostInput,
+    @Ctx() context: AppContext,
+  ) {
+    return this.postsService.likePost(likePostInput.postId, context.user!.id);
   }
 }
