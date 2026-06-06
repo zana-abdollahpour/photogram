@@ -17,7 +17,7 @@ export class PostsRouter {
     // TODO: use real userId
     return this.postsService.create(
       createPostInput,
-      'P2Xcog2FIElsecdpWWfQ6CXaY95qNH99',
+      'GGJlKyF0uf6Xs9RWNksyeT9N9gFW8RDv',
     );
   }
 

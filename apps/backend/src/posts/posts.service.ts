@@ -39,7 +39,7 @@ export class PostsService {
 
     return posts.map((p) => ({
       id: p.id,
-      user: { username: p.user.name, avatar: '' }, // TODO: add real avatar later
+      user: { username: p.user.name, avatar: p.user.image },
       caption: p.caption,
       image: p.image,
       likes: p.likes,
@@ -56,9 +56,9 @@ export class PostsService {
 
     return {
       id: savedPost.id,
-      user: { username: userInfo.name, avatar: '' }, // TODO: add real avatar later
+      user: { username: userInfo.name, avatar: userInfo.image || '' },
       caption: savedPost.caption,
-      image: savedPost.image,
+      image: userInfo.image || '',
       likes: savedPost.likes,
       timestamp: savedPost.createdAt.toISOString(),
       comments: 0, //TODO: add via comments table

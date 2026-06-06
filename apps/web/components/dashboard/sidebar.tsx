@@ -2,12 +2,15 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
+
+import { getImageUrl } from "@/lib/image";
+import { authClient } from "@/lib/auth/client";
 
 import { Card } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth/client";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { AvatarUpload } from "@/components/dashboard/avatar-upload";
 
 interface SuggestedUser {
   id: string;
@@ -68,14 +71,25 @@ export function Sidebar() {
     <div className="space-y-6">
       <Card className="p-4">
         <div className="mb-4 flex items-center space-x-3">
-          <Image
-            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&h=60&fit=crop&crop=face"
-            alt="Your Profile"
-            width={60}
-            height={60}
-            className="size-14 rounded-full"
-            unoptimized // TODO: remove later for real data
-          />
+          <div className="relative">
+            {session?.user.image ? (
+              <Image
+                src={getImageUrl(session?.user.image)}
+                alt="Your Profile"
+                width={60}
+                height={60}
+                className="size-14 rounded-full"
+                unoptimized // TODO: remove later for real data
+              />
+            ) : (
+              <div className="bg-muted flex size-12 items-center justify-center rounded-full">
+                <User className="text-muted-foreground size-4" />
+              </div>
+            )}
+
+            <AvatarUpload />
+          </div>
+
           <div className="min-w-0 flex-1">
             <div className="truncate font-semibold">{session?.user.email}</div>
             <div className="text-muted-foreground truncate text-sm">

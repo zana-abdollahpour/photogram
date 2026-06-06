@@ -1,6 +1,12 @@
+"use client";
+
 import Image from "next/image";
+import { User } from "lucide-react";
+
+import { authClient } from "@/lib/auth/client";
 
 import { Card } from "@/components/ui/card";
+import { getImageUrl } from "@/lib/image";
 
 interface Story {
   id: string;
@@ -10,12 +16,6 @@ interface Story {
 
 // TODO: replace with actual data from backend
 const mockStories: Story[] = [
-  {
-    id: "your_story",
-    username: "Your Story",
-    avatar:
-      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&h=60&fit=crop&crop=face",
-  },
   {
     id: "1",
     username: "johndoe",
@@ -48,10 +48,47 @@ const mockStories: Story[] = [
   },
 ];
 
+const mockMyStory = {
+  id: "your_story",
+  username: "Your Story",
+  avatar:
+    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&h=60&fit=crop&crop=face",
+};
+
 export function Stories() {
+  const { data: session } = authClient.useSession();
+
   return (
     <Card className="p-4">
       <div className="scrollbar-hide flex space-x-4 overflow-x-auto pb-2">
+        <div className="flex shrink-0 flex-col items-center space-y-1">
+          <div className="relative">
+            <div className="rounded-full bg-gray-200 bg-linear-to-tr from-yellow-400 to-fuchsia-600 p-0.5">
+              {session?.user.image ? (
+                <Image
+                  src={getImageUrl(session?.user.image)}
+                  alt="Your profile picture"
+                  width={60}
+                  height={60}
+                  className="size-16 rounded-full"
+                  unoptimized // TODO: remove later for real data
+                />
+              ) : (
+                <div className="bg-muted flex size-16 items-center justify-center rounded-full">
+                  <User className="text-muted-foreground size-6" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <span
+            className="w-16 truncate text-center text-xs"
+            title="Your story"
+          >
+            {mockMyStory.username}
+          </span>
+        </div>
+
         {mockStories.map((story) => (
           <div
             key={story.id}
