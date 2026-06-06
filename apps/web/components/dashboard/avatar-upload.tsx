@@ -70,6 +70,7 @@ export function AvatarUpload() {
       const { filename } = await uploadResponse.json();
       await authClient.updateUser({ image: filename });
       await refetchSession();
+      await utils.postsRouter.findAll.invalidate();
       await utils.postsRouter.findAll.refetch();
 
       handleClearSelection();
@@ -111,6 +112,7 @@ export function AvatarUpload() {
                   height={64}
                   width={64}
                   className="border-muted size-24 rounded-full border-2 object-cover"
+                  unoptimized
                 />
               </div>
             )}

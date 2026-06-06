@@ -82,6 +82,7 @@ export function PhotoUpload() {
 
       const { filename } = await uploadResponse.json();
       await createPost.mutateAsync({ image: filename, caption: caption });
+      await utils.postsRouter.findAll.invalidate();
 
       handleClearSelection();
       if (dialogCloseRef.current) {
