@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Heart, MessageCircle, User } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc/client";
 import { getImageUrl } from "@/lib/image";
 
@@ -20,14 +21,41 @@ interface Post {
   likes: number;
   comments: number;
   timestamp: string;
+  isLiked?: boolean;
 }
 
 export function Feed() {
+  const utils = trpc.useUtils();
   const posts = trpc.postsRouter.findAll.useQuery();
+  const toggleLike = trpc.postsRouter.likePost.useMutation({
+    onMutate: ({ postId }) => {
+      utils.postsRouter.findAll.setData(undefined, (old) => {
+        if (!old) {
+          return old;
+        }
+
+        return old.map((post) => {
+          if (post.id !== postId) {
+            return post;
+          }
+
+          return {
+            ...post,
+            isLiked: !post.isLiked,
+            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+          };
+        });
+      });
+    },
+  });
+
+  const handleToggleLike = (id: number) => {
+    toggleLike.mutate({ postId: id });
+  };
 
   return (
     <div className="space-y-6">
-      {posts.data?.map((post) => (
+      {posts.data?.map((post: Post) => (
         <Card key={post.id} className="overflow-hidden">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-3">
@@ -68,10 +96,17 @@ export function Feed() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {}}
+                  onClick={() => handleToggleLike(+post.id)}
                   className="h-auto p-0"
                 >
-                  <Heart className="text-foreground h-6 w-6" />
+                  <Heart
+                    className={cn(
+                      "size-4",
+                      post.isLiked
+                        ? "fill-red-500 text-red-500"
+                        : "text-foreground",
+                    )}
+                  />
                 </Button>
                 <Button
                   variant="ghost"
@@ -79,7 +114,7 @@ export function Feed() {
                   onClick={() => {}}
                   className="h-auto p-0"
                 >
-                  <MessageCircle className="text-foreground h-6 w-6" />
+                  <MessageCircle className="text-foreground size-4" />
                 </Button>
               </div>
             </div>
@@ -98,7 +133,7 @@ export function Feed() {
             )}
 
             <div className="text-muted-foreground text-xs uppercase">
-              {post.timestamp}
+              {new Date(post.timestamp).toLocaleDateString()}
             </div>
           </div>
         </Card>
