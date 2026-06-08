@@ -14,6 +14,9 @@ import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './auth/users/users.module';
 import { UploadModule } from './upload/upload.module';
 import { AuthTrpcMiddleware } from 'src/auth/auth-trpc.middleware';
+import { CommentsService } from './comments/comments.service';
+import { ModuleService } from './module/module.service';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -38,6 +41,7 @@ import { AuthTrpcMiddleware } from 'src/auth/auth-trpc.middleware';
     PostsModule,
     UsersModule,
     UploadModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [
@@ -47,6 +51,8 @@ import { AuthTrpcMiddleware } from 'src/auth/auth-trpc.middleware';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    CommentsService,
+    ModuleService,
   ],
 })
 export class AppModule {}
