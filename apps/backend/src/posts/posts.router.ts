@@ -16,7 +16,7 @@ import {
   likePostSchema,
   type LikePostInput,
   type CreatePostInput,
-} from 'src/posts/schemas/trpc.schema';
+} from '@repo/trpc/schemas';
 
 import type { AppContext } from 'src/app-context.interface';
 

@@ -10,19 +10,7 @@ import { getImageUrl } from "@/lib/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-interface Post {
-  id: string;
-  user: {
-    username: string;
-    avatar: string;
-  };
-  image: string;
-  caption: string;
-  likes: number;
-  comments: number;
-  timestamp: string;
-  isLiked?: boolean;
-}
+import type { Post } from "@repo/trpc/schemas";
 
 export function Feed() {
   const utils = trpc.useUtils();

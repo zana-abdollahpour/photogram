@@ -6,7 +6,7 @@ import { DATABASE_CONNECTION } from 'src/database/database.connection';
 import { schema } from 'src/database/database.module';
 import { like, post } from 'src/posts/schemas/schema';
 import { UsersService } from 'src/auth/users/users.service';
-import type { CreatePostInput } from 'src/posts/schemas/trpc.schema';
+import type { CreatePostInput } from '@repo/trpc/schemas';
 
 @Injectable()
 export class PostsService {
