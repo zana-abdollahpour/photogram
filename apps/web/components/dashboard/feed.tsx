@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { Heart, MessageCircle, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -11,8 +12,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import type { Post } from "@repo/trpc/schemas";
+import { PostComments } from "@/components/dashboard/post-comments";
 
 export function Feed() {
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(
+    new Set(),
+  );
   const utils = trpc.useUtils();
   const posts = trpc.postsRouter.findAll.useQuery();
   const toggleLike = trpc.postsRouter.likePost.useMutation({
@@ -36,6 +41,20 @@ export function Feed() {
       });
     },
   });
+
+  const toggleComments = (postId: number) => {
+    setExpandedComments((cur) => {
+      const newSet = new Set(cur);
+
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+
+      return newSet;
+    });
+  };
 
   const handleToggleLike = (id: number) => {
     toggleLike.mutate({ postId: id });
@@ -99,10 +118,17 @@ export function Feed() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {}}
+                  onClick={() => toggleComments(post.id)}
                   className="h-auto p-0"
                 >
-                  <MessageCircle className="text-foreground size-4" />
+                  <MessageCircle
+                    className={cn(
+                      "size-4",
+                      expandedComments.has(post.id)
+                        ? "text-primary fill-primary"
+                        : "text-foreground",
+                    )}
+                  />
                 </Button>
               </div>
             </div>
@@ -123,6 +149,12 @@ export function Feed() {
             <div className="text-muted-foreground text-xs uppercase">
               {new Date(post.timestamp).toLocaleDateString()}
             </div>
+
+            {expandedComments.has(post.id) && (
+              <div className="border-t pt-4">
+                <PostComments postId={post.id} />
+              </div>
+            )}
           </div>
         </Card>
       ))}

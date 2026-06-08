@@ -27,7 +27,7 @@ export class PostsService {
 
   async findAll(userId: string) {
     const posts = await this.database.query.post.findMany({
-      with: { user: true, likes: true },
+      with: { user: true, likes: true, comments: true },
       orderBy: [desc(post.createdAt)],
     });
 
@@ -38,7 +38,7 @@ export class PostsService {
       image: savedPost.image,
       likes: savedPost.likes.length,
       timestamp: savedPost.createdAt.toISOString(),
-      comments: 0, //TODO: add via comments table
+      comments: savedPost.comments.length,
       isLiked: savedPost.likes.some((like) => like.userId === userId),
     }));
   }
