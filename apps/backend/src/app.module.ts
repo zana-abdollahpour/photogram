@@ -14,7 +14,6 @@ import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './auth/users/users.module';
 import { UploadModule } from './upload/upload.module';
 import { AuthTrpcMiddleware } from 'src/auth/auth-trpc.middleware';
-import { CommentsService } from './comments/comments.service';
 import { CommentsModule } from './comments/comments.module';
 
 @Module({
@@ -50,7 +49,6 @@ import { CommentsModule } from './comments/comments.module';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    CommentsService,
   ],
 })
 export class AppModule {}
