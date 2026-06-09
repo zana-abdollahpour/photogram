@@ -12,10 +12,12 @@ import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StoryUpload } from "@/components/dashboard/story-upload";
+import { StoryViewer } from "@/components/dashboard/story-viewer";
 
 export function Stories() {
   const [showCreateStory, setShowCreateStory] = useState(false);
   const [showStoryViewer, setShowStoryViewer] = useState(false);
+  const [selectedGroupIndex, setSelectedGroupIndex] = useState(0);
   const utils = trpc.useUtils();
   const { data: session } = authClient.useSession();
 
@@ -33,6 +35,11 @@ export function Stories() {
       utils.storiesRouter.getStories.invalidate();
     },
   });
+
+  const handleViewStory = (index: number) => {
+    setSelectedGroupIndex(index);
+    setShowStoryViewer(true);
+  };
 
   const handleStoryUpdate = async (file: File) => {
     const formData = new FormData();
@@ -67,7 +74,7 @@ export function Stories() {
               )}
               onClick={() => {
                 if (ownStoryGroup) {
-                  setShowStoryViewer(true);
+                  handleViewStory(0);
                 }
               }}
             >
@@ -104,11 +111,11 @@ export function Stories() {
           </span>
         </div>
 
-        {othersStoryGroups?.map((storyGroup) => (
+        {othersStoryGroups?.map((storyGroup, index) => (
           <div
             key={storyGroup.userId}
             className="flex shrink-0 flex-col items-center space-y-1"
-            onClick={() => setShowStoryViewer(true)}
+            onClick={() => handleViewStory(ownStoryGroup ? index + 1 : index)}
           >
             <div className="relative">
               <div className="rounded-full bg-gray-200 bg-linear-to-tr from-yellow-400 to-fuchsia-600 p-0.5">
@@ -143,6 +150,13 @@ export function Stories() {
         open={showCreateStory}
         onOpenChange={setShowCreateStory}
         onSubmit={handleStoryUpdate}
+      />
+
+      <StoryViewer
+        storyGroups={stories.data || []}
+        initialGroupIndex={selectedGroupIndex}
+        open={showStoryViewer}
+        onOpenChange={setShowStoryViewer}
       />
     </Card>
   );
