@@ -43,6 +43,13 @@
       "when": 1780955984098,
       "tag": "0005_hesitant_carmella_unuscione",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781018001591,
+      "tag": "0006_curly_viper",
+      "breakpoints": true
     }
   ]
 }
