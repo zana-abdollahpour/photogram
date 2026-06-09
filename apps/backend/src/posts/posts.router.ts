@@ -14,6 +14,8 @@ import {
   postSchema,
   createPostSchema,
   likePostSchema,
+  findAllPostsSchema,
+  type FindAllPostsInput,
   type LikePostInput,
   type CreatePostInput,
 } from '@repo/trpc/schemas';
@@ -33,9 +35,15 @@ export class PostsRouter {
     return this.postsService.create(createPostInput, context.user?.id || '');
   }
 
-  @Query({ output: z.array(postSchema) })
-  async findAll(@Ctx() context: AppContext) {
-    return this.postsService.findAll(context.user!.id);
+  @Query({ input: findAllPostsSchema, output: z.array(postSchema) })
+  async findAll(
+    @Ctx() context: AppContext,
+    @Input() findAllPostsInput: FindAllPostsInput,
+  ) {
+    return this.postsService.findAll(
+      context.user!.id,
+      findAllPostsInput.userId,
+    );
   }
 
   @Mutation({ input: likePostSchema })
