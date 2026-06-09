@@ -12,12 +12,12 @@ import { AuthTrpcMiddleware } from 'src/auth/auth-trpc.middleware';
 import { CommentsService } from './comments.service';
 import {
   commentSchema,
-  CreateCommentInput,
-  createCommentSchema,
-  DeleteCommentInput,
-  deleteCommentSchema,
-  GetCommentsInput,
   getCommentsSchema,
+  createCommentSchema,
+  deleteCommentSchema,
+  type GetCommentsInput,
+  type DeleteCommentInput,
+  type CreateCommentInput,
 } from '@repo/trpc/schemas';
 import type { AppContext } from 'src/app-context.interface';
 
@@ -31,7 +31,7 @@ export class CommentsRouter {
     @Input() createCommentInput: CreateCommentInput,
     @Ctx() context: AppContext,
   ) {
-    return this.commentsService.create(createCommentInput, context.user.id);
+    return this.commentsService.create(createCommentInput, context.user!.id);
   }
 
   @Query({ input: getCommentsSchema, output: z.array(commentSchema) })
@@ -46,7 +46,7 @@ export class CommentsRouter {
   ) {
     return this.commentsService.delete(
       deleteCommentInput.commentId,
-      context.user.id,
+      context.user!.id,
     );
   }
 }
