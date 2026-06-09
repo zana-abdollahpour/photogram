@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { StoryUpload } from "@/components/dashboard/story-upload";
 
 export function Stories() {
   const [showCreateStory, setShowCreateStory] = useState(false);
@@ -137,6 +138,12 @@ export function Stories() {
           </div>
         ))}
       </div>
+
+      <StoryUpload
+        open={showCreateStory}
+        onOpenChange={setShowCreateStory}
+        onSubmit={handleStoryUpdate}
+      />
     </Card>
   );
 }
