@@ -1,0 +1,44 @@
+"use client";
+
+import Image from "next/image";
+import { Heart, MessageCircle } from "lucide-react";
+
+import { getImageUrl } from "@/lib/image";
+import { Post } from "@repo/trpc/schemas";
+
+interface PostGridProps {
+  posts: Post[];
+  onPostClick: (post: Post) => void;
+}
+
+export function PostsGrid({ posts, onPostClick }: PostGridProps) {
+  return (
+    <div className="grid grid-cols-3 gap-1 md:gap-4">
+      {posts.map((post) => (
+        <div
+          key={post.id}
+          onClick={() => onPostClick(post)}
+          className="group relative aspect-square cursor-pointer overflow-hidden rounded-sm"
+        >
+          <Image
+            src={getImageUrl(post.image)}
+            alt={post.caption}
+            fill
+            className="object-cover"
+            unoptimized
+          />
+          <div className="absolute inset-0 flex items-center justify-center gap-6 bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex items-center gap-2">
+              <Heart className="h-5 w-5" />
+              <span className="font-semibold">{post.likes}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5" />
+              <span className="font-semibold">{post.comments}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
