@@ -31,6 +31,7 @@ export function StoryViewer({
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const shouldAdvanceRef = useRef(false);
+  const router = useRouter();
 
   const currentGroup = storyGroups[currentGroupIndex];
   const currentStory = currentGroup?.stories[currentStoryIndex];
@@ -121,8 +122,6 @@ export function StoryViewer({
   if (!currentGroup || !currentStory) {
     return null;
   }
-
-  const router = useRouter();
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
