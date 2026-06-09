@@ -1,69 +1,75 @@
 "use client";
 
 import Image from "next/image";
-import { User } from "lucide-react";
+import { useState } from "react";
+import { Plus, User } from "lucide-react";
 
+import { trpc } from "@/lib/trpc/client";
 import { authClient } from "@/lib/auth/client";
+import { getImageUrl } from "@/lib/image";
+import { cn } from "@/lib/utils";
 
 import { Card } from "@/components/ui/card";
-import { getImageUrl } from "@/lib/image";
-
-interface Story {
-  id: string;
-  username: string;
-  avatar: string;
-}
-
-// TODO: replace with actual data from backend
-const mockStories: Story[] = [
-  {
-    id: "1",
-    username: "johndoe",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face",
-  },
-  {
-    id: "2",
-    username: "janedoe",
-    avatar:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=60&h=60&fit=crop&crop=faces",
-  },
-  {
-    id: "3",
-    username: "photographer",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face",
-  },
-  {
-    id: "4",
-    username: "traveler",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face",
-  },
-  {
-    id: "5",
-    username: "foodie",
-    avatar:
-      "https://images.unsplash.com/photo-1463453091185-61582044d556?w=60&h=60&fit=crop&crop=face",
-  },
-];
-
-const mockMyStory = {
-  id: "your_story",
-  username: "Your Story",
-  avatar:
-    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&h=60&fit=crop&crop=face",
-};
+import { Button } from "@/components/ui/button";
 
 export function Stories() {
+  const [showCreateStory, setShowCreateStory] = useState(false);
+  const [showStoryViewer, setShowStoryViewer] = useState(false);
+  const utils = trpc.useUtils();
   const { data: session } = authClient.useSession();
+
+  const stories = trpc.storiesRouter.getStories.useQuery() || [];
+
+  const ownStoryGroup = stories.data?.find(
+    (group) => group.userId === session?.user.id,
+  );
+  const othersStoryGroups = stories.data?.filter(
+    (group) => group.userId !== session?.user.id,
+  );
+
+  const createStory = trpc.storiesRouter.create.useMutation({
+    onSuccess: () => {
+      utils.storiesRouter.getStories.invalidate();
+    },
+  });
+
+  const handleStoryUpdate = async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const uploadResponse = await fetch("/api/upload/image", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error("Failed to upload image");
+    }
+
+    const { filename } = await uploadResponse.json();
+    await createStory.mutateAsync({
+      image: filename,
+    });
+  };
 
   return (
     <Card className="p-4">
       <div className="scrollbar-hide flex space-x-4 overflow-x-auto pb-2">
         <div className="flex shrink-0 flex-col items-center space-y-1">
           <div className="relative">
-            <div className="rounded-full bg-gray-200 bg-linear-to-tr from-yellow-400 to-fuchsia-600 p-0.5">
+            <div
+              className={cn(
+                "rounded-full p-0.5",
+                ownStoryGroup
+                  ? "bg-linear-to-tr from-yellow-400 to-fuchsia-600"
+                  : "bg-gray-200",
+              )}
+              onClick={() => {
+                if (ownStoryGroup) {
+                  setShowStoryViewer(true);
+                }
+              }}
+            >
               {session?.user.image ? (
                 <Image
                   src={getImageUrl(session?.user.image)}
@@ -79,39 +85,54 @@ export function Stories() {
                 </div>
               )}
             </div>
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute right-0 bottom-0 size-5 rounded-full border-2 border-white"
+              onClick={() => setShowCreateStory(true)}
+            >
+              <Plus className="size-3" />
+            </Button>
           </div>
 
           <span
             className="w-16 truncate text-center text-xs"
             title="Your story"
           >
-            {mockMyStory.username}
+            Your Story
           </span>
         </div>
 
-        {mockStories.map((story) => (
+        {othersStoryGroups?.map((storyGroup) => (
           <div
-            key={story.id}
+            key={storyGroup.userId}
             className="flex shrink-0 flex-col items-center space-y-1"
+            onClick={() => setShowStoryViewer(true)}
           >
             <div className="relative">
               <div className="rounded-full bg-gray-200 bg-linear-to-tr from-yellow-400 to-fuchsia-600 p-0.5">
-                <Image
-                  src={story.avatar}
-                  alt={story.username}
-                  width={64}
-                  height={64}
-                  className="h-16 w-16 rounded-full border-2 border-white object-cover"
-                  unoptimized // TODO: remove later for real data
-                />
+                {storyGroup.avatar ? (
+                  <Image
+                    src={getImageUrl(storyGroup.avatar)}
+                    alt={storyGroup.username}
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 rounded-full border-2 border-white object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="bg-muted flex size-16 items-center justify-center rounded-full border-2 border-white">
+                    <User className="text-muted-foreground size-6" />
+                  </div>
+                )}
               </div>
             </div>
 
             <span
               className="w-16 truncate text-center text-xs"
-              title={story.username}
+              title={storyGroup.username}
             >
-              {story.username}
+              {storyGroup.username}
             </span>
           </div>
         ))}
