@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, User, X } from "lucide-react";
 
 import { StoryGroup } from "@repo/trpc/schemas";
@@ -30,6 +30,7 @@ export function StoryViewer({
   const [currentGroupIndex, setCurrentGroupIndex] = useState(initialGroupIndex);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const shouldAdvanceRef = useRef(false);
 
   const currentGroup = storyGroups[currentGroupIndex];
   const currentStory = currentGroup?.stories[currentStoryIndex];
@@ -42,10 +43,17 @@ export function StoryViewer({
     if (currentStoryIndex < currentGroup.stories.length - 1) {
       setCurrentStoryIndex((cur) => cur + 1);
       setProgress(0);
-    } else {
+      return;
+    }
+
+    if (currentGroupIndex < storyGroups.length - 1) {
+      setCurrentGroupIndex((cur) => cur + 1);
       setCurrentStoryIndex(0);
       setProgress(0);
+      return;
     }
+
+    onOpenChange(false);
   };
 
   const handlePrevious = () => {
@@ -55,6 +63,17 @@ export function StoryViewer({
 
     if (currentStoryIndex > 0) {
       setCurrentStoryIndex((cur) => cur - 1);
+      setProgress(0);
+      return;
+    }
+
+    if (currentGroupIndex > 0) {
+      const prevGroup = storyGroups[currentGroupIndex - 1];
+      if (!prevGroup) {
+        return;
+      }
+      setCurrentGroupIndex((cur) => cur - 1);
+      setCurrentStoryIndex(prevGroup.stories.length - 1);
       setProgress(0);
     }
   };
@@ -73,10 +92,12 @@ export function StoryViewer({
     }
 
     setProgress(0);
+    shouldAdvanceRef.current = false;
+
     const interval = setInterval(() => {
       setProgress((cur) => {
         if (cur >= 100) {
-          handleNext();
+          shouldAdvanceRef.current = true;
           return 0;
         }
         return cur + 2;
@@ -85,6 +106,13 @@ export function StoryViewer({
 
     return () => clearInterval(interval);
   }, [currentStory?.id, open]);
+
+  useEffect(() => {
+    if (shouldAdvanceRef.current) {
+      shouldAdvanceRef.current = false;
+      handleNext();
+    }
+  });
 
   const handleClose = () => {
     onOpenChange(false);
