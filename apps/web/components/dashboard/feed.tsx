@@ -19,10 +19,10 @@ export function Feed() {
     new Set(),
   );
   const utils = trpc.useUtils();
-  const posts = trpc.postsRouter.findAll.useQuery();
+  const posts = trpc.postsRouter.findAll.useQuery({});
   const toggleLike = trpc.postsRouter.likePost.useMutation({
     onMutate: ({ postId }) => {
-      utils.postsRouter.findAll.setData(undefined, (old) => {
+      utils.postsRouter.findAll.setData({}, (old) => {
         if (!old) {
           return old;
         }

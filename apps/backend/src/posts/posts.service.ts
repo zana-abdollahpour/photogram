@@ -6,7 +6,7 @@ import { DATABASE_CONNECTION } from 'src/database/database.connection';
 import { schema } from 'src/database/database.module';
 import { like, post } from 'src/posts/schemas/schema';
 import { UsersService } from 'src/auth/users/users.service';
-import type { CreatePostInput } from '@repo/trpc/schemas';
+import type { CreatePostInput, Post } from '@repo/trpc/schemas';
 
 @Injectable()
 export class PostsService {
@@ -25,19 +25,26 @@ export class PostsService {
     });
   }
 
-  async findAll(userId: string, postUserId?: string) {
+  async findAll(userId: string, postUserId?: string): Promise<Post[]> {
     const posts = await this.database.query.post.findMany({
-      with: { user: true, likes: true, comments: true },
+      with: {
+        user: true,
+        likes: true,
+        comments: true,
+      },
       where: postUserId ? eq(post.userId, postUserId) : undefined,
       orderBy: [desc(post.createdAt)],
     });
-
     return posts.map((savedPost) => ({
       id: savedPost.id,
-      user: { username: savedPost.user.name, avatar: savedPost.user.image },
-      caption: savedPost.caption,
+      user: {
+        username: savedPost.user.name,
+        id: savedPost.user.id,
+        avatar: savedPost.user.image || '',
+      },
       image: savedPost.image,
       likes: savedPost.likes.length,
+      caption: savedPost.caption,
       timestamp: savedPost.createdAt.toISOString(),
       comments: savedPost.comments.length,
       isLiked: savedPost.likes.some((like) => like.userId === userId),
