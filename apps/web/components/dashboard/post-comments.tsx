@@ -6,6 +6,7 @@ interface PostCommentsProps {
 }
 
 export function PostComments({ postId }: PostCommentsProps) {
+  const utils = trpc.useUtils();
   const { data: comments } = trpc.commentsRouter.findByPostId.useQuery({
     postId,
   });
@@ -36,11 +37,19 @@ export function PostComments({ postId }: PostCommentsProps) {
     },
   });
 
+  const handleAddCommentSubmit = (text: string) => {
+    handleAddComment.mutate({ postId, text });
+  };
+
+  const handleDeleteCommentSubmit = (commentId: number) => {
+    handleDeleteComment.mutate({ commentId });
+  };
+
   return (
     <Comments
       comments={comments || []}
-      onAddComment={(text) => handleAddComment(postId, text)}
-      onDeleteComment={handleDeleteComment}
+      onAddComment={handleAddCommentSubmit}
+      onDeleteComment={handleDeleteCommentSubmit}
     />
   );
 }
