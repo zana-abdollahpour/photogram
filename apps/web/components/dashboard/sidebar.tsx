@@ -72,29 +72,45 @@ export function Sidebar() {
       <Card className="p-4">
         <div className="mb-4 flex items-center space-x-3">
           <div className="relative">
-            {session?.user.image ? (
-              <Image
-                src={getImageUrl(session?.user.image)}
-                alt="Your Profile"
-                width={60}
-                height={60}
-                className="size-14 rounded-full"
-                unoptimized // TODO: remove later for real data
-              />
-            ) : (
-              <div className="bg-muted flex size-12 items-center justify-center rounded-full">
-                <User className="text-muted-foreground size-4" />
-              </div>
-            )}
+            <Button
+              variant="ghost"
+              className="h-auto w-full p-0 text-left transition-opacity hover:bg-transparent hover:opacity-80"
+              onClick={() => router.push(`/users/${session?.user.id}`)}
+            >
+              {session?.user.image ? (
+                <Image
+                  src={getImageUrl(session?.user.image)}
+                  alt="Your Profile"
+                  width={60}
+                  height={60}
+                  className="size-14 rounded-full"
+                  unoptimized // TODO: remove later for real data
+                />
+              ) : (
+                <div className="bg-muted flex size-12 items-center justify-center rounded-full">
+                  <User className="text-muted-foreground size-4" />
+                </div>
+              )}
+            </Button>
 
             <AvatarUpload />
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="truncate font-semibold">{session?.user.email}</div>
-            <div className="text-muted-foreground truncate text-sm">
-              {session?.user.name}
-            </div>
+            <Button
+              variant="ghost"
+              className="h-auto w-full p-0 text-left transition-opacity hover:bg-transparent hover:opacity-80"
+              onClick={() => router.push(`/users/${session?.user.id}`)}
+            >
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-semibold">
+                  {session?.user.email}
+                </div>
+                <div className="text-muted-foreground truncate text-sm">
+                  {session?.user.name}
+                </div>
+              </div>
+            </Button>
           </div>
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">

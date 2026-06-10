@@ -3,21 +3,22 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Heart, MessageCircle, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc/client";
 import { getImageUrl } from "@/lib/image";
+import type { Post } from "@repo/trpc/schemas";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-import type { Post } from "@repo/trpc/schemas";
 import { PostComments } from "@/components/dashboard/post-comments";
 
 export function Feed() {
   const [expandedComments, setExpandedComments] = useState<Set<number>>(
     new Set(),
   );
+  const router = useRouter();
   const utils = trpc.useUtils();
   const posts = trpc.postsRouter.findAll.useQuery({});
   const toggleLike = trpc.postsRouter.likePost.useMutation({
@@ -66,24 +67,30 @@ export function Feed() {
         <Card key={post.id} className="overflow-hidden">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-3">
-              {getImageUrl(post.user.avatar) ? (
-                <Image
-                  src={getImageUrl(post.user.avatar)}
-                  alt={post.user.username}
-                  width={64}
-                  height={64}
-                  className="h-8 w-8 rounded-full"
-                  unoptimized // TODO: remove later for real data
-                />
-              ) : (
-                <div className="bg-muted flex size-8 items-center justify-center rounded-full">
-                  <User className="text-muted-foreground size-4" />
-                </div>
-              )}
+              <Button
+                variant="ghost"
+                className="p-0"
+                onClick={() => router.push(`/users/${post.user.id}`)}
+              >
+                {getImageUrl(post.user.avatar) ? (
+                  <Image
+                    src={getImageUrl(post.user.avatar)}
+                    alt={post.user.username}
+                    width={64}
+                    height={64}
+                    className="h-8 w-8 rounded-full"
+                    unoptimized // TODO: remove later for real data
+                  />
+                ) : (
+                  <div className="bg-muted flex size-8 items-center justify-center rounded-full">
+                    <User className="text-muted-foreground size-4" />
+                  </div>
+                )}
 
-              <span className="text-sm font-semibold">
-                {post.user.username}
-              </span>
+                <span className="text-sm font-semibold">
+                  {post.user.username}
+                </span>
+              </Button>
             </div>
           </div>
 
