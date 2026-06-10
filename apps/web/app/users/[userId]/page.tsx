@@ -9,6 +9,7 @@ import { Post } from "@repo/trpc/schemas";
 import { ProfileHeader } from "@/components/users/profile-header";
 import { ProfileNavigation } from "@/components/users/profile-navigation";
 import { ProfileTabs } from "@/components/users/profile-tabs";
+import { PostModal } from "@/components/users/post-modal";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -109,6 +110,14 @@ export default function ProfilePage() {
           onPostClick={handlePostClick}
         />
       </div>
+
+      {selectedPost && (
+        <PostModal
+          post={selectedPost}
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+        />
+      )}
     </div>
   );
 }
