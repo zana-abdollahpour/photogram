@@ -37,7 +37,7 @@ export function Comments({
           <div key={comment.id} className="flex items-start space-x-2">
             <Button
               variant="ghost"
-              className="p-0 pt-3"
+              className="p-1 pt-3"
               onClick={() => router.push(`/users/${comment.user.id}`)}
             >
               {getImageUrl(comment.user.avatar) ? (
@@ -47,6 +47,7 @@ export function Comments({
                   width={32}
                   height={32}
                   className="h-8 w-8 shrink-0 rounded-full"
+                  unoptimized
                 />
               ) : (
                 <div className="bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
@@ -60,7 +61,7 @@ export function Comments({
                   <Button
                     variant="ghost"
                     onClick={() => router.push(`/users/${comment.user.id}`)}
-                    className="mt-1 p-0 text-sm font-semibold"
+                    className="p-1 text-sm font-semibold"
                   >
                     {comment.user.username}
                   </Button>

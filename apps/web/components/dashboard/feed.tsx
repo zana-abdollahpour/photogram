@@ -69,7 +69,7 @@ export function Feed() {
             <div className="flex items-center space-x-3">
               <Button
                 variant="ghost"
-                className="p-0"
+                className="p-1"
                 onClick={() => router.push(`/users/${post.user.id}`)}
               >
                 {getImageUrl(post.user.avatar) ? (
@@ -79,7 +79,7 @@ export function Feed() {
                     width={64}
                     height={64}
                     className="h-8 w-8 rounded-full"
-                    unoptimized // TODO: remove later for real data
+                    unoptimized
                   />
                 ) : (
                   <div className="bg-muted flex size-8 items-center justify-center rounded-full">
@@ -100,7 +100,7 @@ export function Feed() {
               src={getImageUrl(post.image)}
               alt="Post"
               className="object-cover"
-              unoptimized // TODO: remove later for real data
+              unoptimized
             />
           </div>
 
@@ -143,14 +143,24 @@ export function Feed() {
             <div className="text-sm font-semibold">{post.likes} likes</div>
 
             <div className="text-sm">
-              <span className="font-semibold">{post.user.username} </span>
+              <Button
+                variant="ghost"
+                className="h-auto p-0 font-semibold hover:bg-transparent hover:opacity-80"
+                onClick={() => router.push("/users/${post.user.id}")}
+              >
+                {post.user.username}
+              </Button>{" "}
               {post.caption}
             </div>
 
             {post.comments > 0 && (
-              <div className="text-muted-foreground text-sm">
+              <Button
+                variant="ghost"
+                className="text-muted-foreground h-auto p-0 text-sm hover:bg-transparent hover:opacity-80"
+                onClick={() => toggleComments(post.id)}
+              >
                 View all {post.comments} comments
-              </div>
+              </Button>
             )}
 
             <div className="text-muted-foreground text-xs uppercase">

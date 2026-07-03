@@ -84,7 +84,7 @@ export function Sidebar() {
                   width={60}
                   height={60}
                   className="size-14 rounded-full"
-                  unoptimized // TODO: remove later for real data
+                  unoptimized
                 />
               ) : (
                 <div className="bg-muted flex size-12 items-center justify-center rounded-full">
@@ -144,7 +144,7 @@ export function Sidebar() {
                 className="size-8 rounded-full"
                 width={40}
                 height={40}
-                unoptimized // TODO: remove later for real data
+                unoptimized
               />
 
               <div className="min-w-0 flex-1">
