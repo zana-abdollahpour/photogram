@@ -10,6 +10,7 @@ import { ProfileHeader } from "@/components/users/profile-header";
 import { ProfileNavigation } from "@/components/users/profile-navigation";
 import { ProfileTabs } from "@/components/users/profile-tabs";
 import { PostModal } from "@/components/users/post-modal";
+import { EditProfileModal } from "@/components/dashboard/edit-profile-modal";
 
 export default function ProfilePage() {
   const params = useParams();
@@ -118,6 +119,12 @@ export default function ProfilePage() {
           onOpenChange={setIsModalOpen}
         />
       )}
+
+      <EditProfileModal
+        open={isEditProfileOpen}
+        onOpenChange={setIsEditProfileOpen}
+        profile={profile}
+      />
     </div>
   );
 }
