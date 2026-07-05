@@ -12,7 +12,12 @@ import { authClient } from "@/lib/auth/client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface PostModalProps {
   post: Post;
@@ -85,6 +90,10 @@ export function PostModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[90vh] w-full max-w-5xl! flex-col overflow-hidden p-0">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Post Modal</DialogTitle>
+        </DialogHeader>
+
         <div className="grid h-full flex-1 overflow-hidden md:grid-cols-[1.5fr_1fr]">
           <div className="relative flex min-h-0 items-center justify-center bg-black">
             <div className="relative h-full w-full">
@@ -112,6 +121,7 @@ export function PostModal({
                     width={40}
                     height={40}
                     className="h-10 w-10 rounded-full object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
@@ -136,6 +146,7 @@ export function PostModal({
                       width={32}
                       height={32}
                       className="h-8 w-8 rounded-full object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
@@ -178,6 +189,7 @@ export function PostModal({
                           width={32}
                           height={32}
                           className="h-8 w-8 rounded-full"
+                          unoptimized
                         />
                       ) : (
                         <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
