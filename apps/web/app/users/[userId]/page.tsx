@@ -3,18 +3,23 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 
-import { trpc } from "@/lib/trpc/client";
 import { Post } from "@repo/trpc/schemas";
+
+import { trpc } from "@/lib/trpc/client";
+import { authClient } from "@/lib/auth/client";
 
 import { ProfileHeader } from "@/components/users/profile-header";
 import { ProfileNavigation } from "@/components/users/profile-navigation";
 import { ProfileTabs } from "@/components/users/profile-tabs";
 import { PostModal } from "@/components/users/post-modal";
 import { EditProfileModal } from "@/components/dashboard/edit-profile-modal";
+import { FollowersFollowingModal } from "@/components/users/followers-following-modal";
 
 export default function ProfilePage() {
   const params = useParams();
+  const utils = trpc.useUtils();
   const userId = params.userId as string;
+  const { data: session, refetch: refetchSession } = authClient.useSession();
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,12 +30,14 @@ export default function ProfilePage() {
     open: false,
     type: "followers",
   });
-  const utils = trpc.useUtils();
   const { data: profile, isLoading } = trpc.usersRouter.getUserProfile.useQuery(
     {
       userId,
     },
   );
+
+  const isOwnProfile = session?.user.id === profile?.id;
+
   const { data: posts = [] } = trpc.postsRouter.findAll.useQuery({
     userId,
   });
@@ -88,7 +95,7 @@ export default function ProfilePage() {
 
       <div className="mx-auto max-w-4xl px-4 py-8">
         <ProfileHeader
-          isOwnProfile={true} // TODO: replace with real check
+          isOwnProfile={isOwnProfile}
           profile={profile}
           onFollowToggle={handleFollowToggle}
           onEditProfile={() => setIsEditProfileOpen(true)}
@@ -104,7 +111,7 @@ export default function ProfilePage() {
         />
 
         <ProfileTabs
-          isOwnProfile={true} // TODO: replace with real check
+          isOwnProfile={isOwnProfile}
           userPosts={posts}
           savedPosts={[]}
           name={profile.name}
@@ -124,6 +131,15 @@ export default function ProfilePage() {
         open={isEditProfileOpen}
         onOpenChange={setIsEditProfileOpen}
         profile={profile}
+      />
+
+      <FollowersFollowingModal
+        open={followersFollowingModal.open}
+        onOpenChange={(open) => {
+          setFollowersFollowingModal({ ...followersFollowingModal, open });
+        }}
+        userId={userId}
+        type={followersFollowingModal.type}
       />
     </div>
   );
