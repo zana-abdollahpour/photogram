@@ -74,6 +74,7 @@ export function StoryUpload({
                 height={64}
                 width={64}
                 className="h-96 w-full rounded-lg object-cover"
+                unoptimized
               />
               <Button
                 variant="ghost"

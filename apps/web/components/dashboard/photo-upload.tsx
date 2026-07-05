@@ -120,6 +120,7 @@ export function PhotoUpload() {
                 height={64}
                 width={64}
                 className="h-64 w-full rounded-lg object-contain"
+                unoptimized
               />
               <Button
                 variant="ghost"

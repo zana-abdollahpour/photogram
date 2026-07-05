@@ -168,6 +168,7 @@ export function StoryViewer({
                   width={32}
                   height={32}
                   className="h-8 w-8 rounded-full border-2 border-white object-cover"
+                  unoptimized
                 />
               ) : (
                 <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-white/20">

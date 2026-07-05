@@ -85,7 +85,7 @@ export function Stories() {
                   width={60}
                   height={60}
                   className="size-16 rounded-full"
-                  unoptimized // TODO: remove later for real data
+                  unoptimized
                 />
               ) : (
                 <div className="bg-muted flex size-16 items-center justify-center rounded-full">

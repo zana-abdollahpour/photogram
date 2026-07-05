@@ -130,6 +130,7 @@ export function AvatarUpload() {
                   height={64}
                   width={64}
                   className="border-primary h-32 w-32 rounded-full border-2 object-cover"
+                  unoptimized
                 />
                 <Button
                   variant="ghost"
