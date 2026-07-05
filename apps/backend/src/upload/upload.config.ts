@@ -7,11 +7,10 @@ import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/m
 import { BadRequestException } from '@nestjs/common';
 
 const generateFileName = (file: Express.Multer.File) => {
-  const name = file.originalname.split('.').slice(0, -1).join('.');
   const fileExtName = extname(file.originalname);
   const randomName = uuidV4();
 
-  return `${name}-${Date.now()}-${randomName}${fileExtName}`;
+  return `${Date.now()}-${randomName}${fileExtName}`;
 };
 
 const editFileName = (
