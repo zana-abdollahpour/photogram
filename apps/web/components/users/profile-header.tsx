@@ -42,6 +42,7 @@ export function ProfileHeader({
               width={150}
               height={150}
               className="h-32 w-32 rounded-full border-2 object-cover md:h-40 md:w-40"
+              unoptimized
             />
           ) : (
             <div className="bg-muted flex h-32 w-32 items-center justify-center rounded-full border-2 md:h-40 md:w-40">
