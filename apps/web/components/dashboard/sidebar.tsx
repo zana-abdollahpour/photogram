@@ -6,61 +6,25 @@ import { LogOut, User } from "lucide-react";
 
 import { getImageUrl } from "@/lib/image";
 import { authClient } from "@/lib/auth/client";
+import { trpc } from "@/lib/trpc/client";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { AvatarUpload } from "@/components/dashboard/avatar-upload";
 
-interface SuggestedUser {
-  id: string;
-  username: string;
-  avatar: string;
-  followedBy: string;
-}
-
-// TODO: replace with real data
-const mockSuggestions: SuggestedUser[] = [
-  {
-    id: "1",
-    username: "alexsmith",
-    avatar:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-    followedBy: "johndoe",
-  },
-  {
-    id: "2",
-    username: "sarahwilson",
-    avatar:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=40&h=40&fit=crop&crop=face",
-    followedBy: "janedoe",
-  },
-  {
-    id: "3",
-    username: "mikejohnson",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-    followedBy: "photographer",
-  },
-  {
-    id: "4",
-    username: "emilydavis",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-    followedBy: "photographer",
-  },
-  {
-    id: "5",
-    username: "davidbrown",
-    avatar:
-      "https://images.unsplash.com/photo-1463453091185-61582044d556?w=40&h=40&fit=crop&crop=face",
-    followedBy: "traveler",
-  },
-];
-
 export function Sidebar() {
   const router = useRouter();
+  const utils = trpc.useUtils();
   const { data: session } = authClient.useSession();
+  const { data: suggestedUsers = [] } =
+    trpc.usersRouter.getSuggestedUsers.useQuery();
+
+  const followMutation = trpc.usersRouter.follow.useMutation({
+    onSuccess: () => {
+      utils.usersRouter.getSuggestedUsers.invalidate();
+    },
+  });
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -136,35 +100,54 @@ export function Sidebar() {
         </div>
 
         <div className="space-y-3">
-          {mockSuggestions.map((user) => (
-            <div key={user.id} className="flex items-center space-x-3">
-              <Image
-                src={user.avatar}
-                alt={user.username}
-                className="size-8 rounded-full"
-                width={40}
-                height={40}
-                unoptimized
-              />
-
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold">{user.username}</div>
-                {user.followedBy && (
-                  <div className="text-muted-foreground text-xs">
-                    Followed by {user.followedBy}
+          {suggestedUsers.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              No suggestions available
+            </p>
+          ) : (
+            suggestedUsers.map((user) => (
+              <div key={user.id} className="flex items-center justify-between">
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push(`/users/${user.id}`)}
+                  className="flex h-auto items-center gap-3 p-0 hover:bg-transparent"
+                >
+                  {user.image ? (
+                    <Image
+                      src={getImageUrl(user.image)}
+                      alt={user.name}
+                      className="h-8 w-8 rounded-full object-cover"
+                      width={40}
+                      height={40}
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
+                      <User className="text-muted-foreground h-4 w-4" />
+                    </div>
+                  )}
+                  <div className="min-w-0 text-left">
+                    <div className="text-sm font-semibold">{user.name}</div>
+                    {user.bio && (
+                      <div className="text-muted-foreground truncate text-xs">
+                        {user.bio}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </Button>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-primary hover:text-primary/90 text-xs"
-              >
-                Follow
-              </Button>
-            </div>
-          ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary hover:text-primary/90 text-xs"
+                  onClick={() => followMutation.mutate({ userId: user.id })}
+                  disabled={followMutation.isPending}
+                >
+                  Follow
+                </Button>
+              </div>
+            ))
+          )}
         </div>
       </Card>
     </div>
