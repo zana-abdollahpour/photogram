@@ -1,11 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 
 import { DATABASE_CONNECTION } from 'src/database/database.connection';
 import { schema } from 'src/database/database.module';
 import { like, post } from 'src/posts/schemas/schema';
 import { UsersService } from 'src/auth/users/users.service';
+import { follow } from 'src/auth/schema';
 import type { CreatePostInput, Post } from '@repo/trpc/schemas';
 
 @Injectable()
@@ -32,7 +33,9 @@ export class PostsService {
         likes: true,
         comments: true,
       },
-      where: postUserId ? eq(post.userId, postUserId) : undefined,
+      where: postUserId
+        ? eq(post.userId, postUserId)
+        : inArray(post.userId, await this.getFollowedUserIds(userId)),
       orderBy: [desc(post.createdAt)],
     });
     return posts.map((savedPost) => ({
@@ -49,6 +52,14 @@ export class PostsService {
       comments: savedPost.comments.length,
       isLiked: savedPost.likes.some((like) => like.userId === userId),
     }));
+  }
+
+  private async getFollowedUserIds(userId: string) {
+    const following = await this.database
+      .select({ id: follow.followingId })
+      .from(follow)
+      .where(eq(follow.followerId, userId));
+    return [userId, ...following.map((f) => f.id)];
   }
 
   async likePost(postId: number, userId: string) {
