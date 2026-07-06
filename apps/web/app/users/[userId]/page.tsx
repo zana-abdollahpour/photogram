@@ -31,10 +31,10 @@ export default function ProfilePage() {
     type: "followers",
   });
   const { data: profile, isLoading } = trpc.usersRouter.getUserProfile.useQuery(
-    {
-      userId,
-    },
+    { userId },
   );
+
+  const { data: savedPosts = [] } = trpc.postsRouter.getSavedPosts.useQuery();
 
   const isOwnProfile = session?.user.id === profile?.id;
 
@@ -113,7 +113,7 @@ export default function ProfilePage() {
         <ProfileTabs
           isOwnProfile={isOwnProfile}
           userPosts={posts}
-          savedPosts={[]}
+          savedPosts={savedPosts}
           name={profile.name}
           onPostClick={handlePostClick}
         />

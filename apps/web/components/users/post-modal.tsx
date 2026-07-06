@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bookmark, Heart, Trash2, User } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { Post } from "@repo/trpc/schemas";
 import { trpc } from "@/lib/trpc/client";
 import { getImageUrl } from "@/lib/image";
@@ -56,6 +57,7 @@ export function PostModal({
       utils.usersRouter.getUserProfile.invalidate();
     },
   });
+
   const createCommentMutation = trpc.commentsRouter.create.useMutation({
     onSuccess: (_, variables) => {
       utils.commentsRouter.findByPostId.invalidate({
@@ -66,11 +68,15 @@ export function PostModal({
     },
   });
 
-  const savePostMutation = () => {}; // TODO: implement save post mutation
-  savePostMutation.isPending = false; // TODO: replace with actual loading state
+  const savePostMutation = trpc.postsRouter.savePost.useMutation({
+    onSuccess: () => {
+      utils.postsRouter.findAll.invalidate();
+      utils.postsRouter.getSavedPosts.invalidate();
+    },
+  });
 
   const handleSave = async () => {
-    // TODO: implement save post functionality
+    await savePostMutation.mutateAsync({ postId: post.id });
   };
 
   const handleAddComment = async (e: React.FormEvent) => {
@@ -265,7 +271,7 @@ export function PostModal({
                   className="h-auto p-0"
                 >
                   <Bookmark
-                    className={`h-6 w-6 ${post.isSaved ? "fill-foreground" : ""}`}
+                    className={cn("size-6", post.isSaved && "fill-foreground")}
                   />
                 </Button>
               </div>

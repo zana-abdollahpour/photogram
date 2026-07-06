@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Heart, MessageCircle, User } from "lucide-react";
+import { Bookmark, Heart, MessageCircle, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
@@ -21,6 +21,27 @@ export function Feed() {
   const router = useRouter();
   const utils = trpc.useUtils();
   const posts = trpc.postsRouter.findAll.useQuery({});
+
+  const savePostMutation = trpc.postsRouter.savePost.useMutation({
+    onMutate: ({ postId }) => {
+      utils.postsRouter.findAll.setData({}, (old) => {
+        if (!old) {
+          return old;
+        }
+
+        return old.map((post) => {
+          if (post.id === postId) {
+            return {
+              ...post,
+              isSaved: !post.isSaved,
+            };
+          }
+          return post;
+        });
+      });
+    },
+  });
+
   const toggleLike = trpc.postsRouter.likePost.useMutation({
     onMutate: ({ postId }) => {
       utils.postsRouter.findAll.setData({}, (old) => {
@@ -59,6 +80,10 @@ export function Feed() {
 
   const handleToggleLike = (id: number) => {
     toggleLike.mutate({ postId: id });
+  };
+
+  const handleSavePost = (postId: number) => {
+    savePostMutation.mutate({ postId });
   };
 
   return (
@@ -138,6 +163,16 @@ export function Feed() {
                   />
                 </Button>
               </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSavePost(post.id)}
+              >
+                <Bookmark
+                  className={cn("size-6", post.isSaved && "fill-foreground")}
+                />
+              </Button>
             </div>
 
             <div className="text-sm font-semibold">{post.likes} likes</div>
