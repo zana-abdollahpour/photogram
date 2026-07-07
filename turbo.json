@@ -8,6 +8,11 @@
       "outputs": [".next/**", "!.next/cache/**"],
       "env": ["API_URL", "BACKEND_HOST", "BACKEND_PROTOCOL"]
     },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
